@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="myCanvas" width="400" height="400"></canvas>
+
+    <script>
+        // 캔버스 요소 가져오기
+        const canvas = document.getElementById('myCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // 공의 초기 위치와 속도 설정
+        let x = canvas.width / 2;
+        let y = canvas.height / 2;
+        let dx = 2;
+        let dy = -2;
+        const ballRadius = 10;
+
+        // 박스 설정
+        const boxX = 100;
+        const boxY = 100;
+        const boxWidth = 200;
+        const boxHeight = 200;
+
+        // 키 상태를 저장하는 객체
+        const keyState = {};
+
+        // 키보드 이벤트 핸들러
+        window.addEventListener('keydown', (e) => {
+            keyState[e.key] = true;
+        });
+        window.addEventListener('keyup', (e) => {
+            keyState[e.key] = false;
+        });
+
+        // 공 그리기 함수
+        function drawBall() {
+            ctx.beginPath();
+            ctx.arc(x, y, ballRadius, 0, Math.PI * 2);
+            ctx.fillStyle = 'red';
+            ctx.fill();
+            ctx.closePath();
+        }
+
+        // 박스 그리기 함수
+        function drawBox() {
+            ctx.beginPath();
+            ctx.rect(boxX, boxY, boxWidth, boxHeight);
+            ctx.strokeStyle = 'black';
+            ctx.stroke();
+            ctx.closePath();
+        }
+
+        // 게임 루프
+        function draw() {
+            // 이전 프레임 지우기
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 박스 그리기
+            drawBox();
+
+            // 공 그리기
+            drawBall();
+
+            // 키 입력에 따라 공 이동
+            if (keyState['w']) {
+                y -= dy;
+            }
+            if (keyState['s']) {
+                y += dy;
+            }
+            if (keyState['a']) {
+                x -= dx;
+            }
+            if (keyState['d']) {
+                x += dx;
+            }
+
+            // 공이 캔버스 경계에 닿으면 방향 반전
+            if (x + dx > canvas.width - ballRadius || x + dx < ballRadius) {
+                dx = -dx;
+            }
+            if (y + dy > canvas.height - ballRadius || y + dy < ballRadius) {
+                dy = -dy;
+            }
+
+            // 공이 박스 경계에 닿으면 멈춤
+            if (
+                x + dx > boxX &&
+                x + dx < boxX + boxWidth &&
+                y + dy > boxY &&
+                y + dy < boxY + boxHeight
+            ) {
+                dx = 0;
+                dy = 0;
+            }
+
+            // 공의 좌표 업데이트
+            x += dx;
+            y += dy;
+
+            // 다음 프레임 요청
+            requestAnimationFrame(draw);
+        }
+
+        // 게임 루프 시작
+        draw();
+    </script>
+</body>
+</html>
